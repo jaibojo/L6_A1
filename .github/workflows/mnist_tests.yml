@@ -1,0 +1,56 @@
+name: MNIST Model Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+        
+    - name: Cache pip packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install torch torchvision tabulate
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Run tests
+      run: |
+        python test_requirements.py
+        
+    - name: Check model size
+      run: |
+        python -c "from test_requirements import count_parameters, MNISTModel; model = MNISTModel(); print(f'Model has {count_parameters(model)} parameters')"
+        
+    - name: Verify files exist
+      run: |
+        for file in model.py train.py logger.py test_requirements.py; do
+          if [ ! -f "$file" ]; then
+            echo "❌ Missing required file: $file"
+            exit 1
+          fi
+        done
+        echo "✓ All required files present"
+
+    - name: Check code formatting
+      run: |
+        pip install black
+        black --check . 
