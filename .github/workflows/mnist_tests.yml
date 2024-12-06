@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  test:
+  train_and_test:
     runs-on: ubuntu-latest
     
     steps:
@@ -31,16 +31,23 @@ jobs:
         python -m pip install --upgrade pip
         pip install torch torchvision tabulate
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        
+
+    - name: Train model
+      run: |
+        python train.py
+
     - name: Run tests
+      if: success()  # Only run tests if training succeeds
       run: |
         python test_requirements.py
         
     - name: Check model size
+      if: success()  # Only check model size if training succeeds
       run: |
         python -c "from test_requirements import count_parameters, MNISTModel; model = MNISTModel(); print(f'Model has {count_parameters(model)} parameters')"
         
     - name: Verify files exist
+      if: success()  # Only verify files if training succeeds
       run: |
         for file in model.py train.py logger.py test_requirements.py; do
           if [ ! -f "$file" ]; then
@@ -53,4 +60,4 @@ jobs:
     - name: Check code formatting
       run: |
         pip install black
-        black --check . 
+        black --check .
