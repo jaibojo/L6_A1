@@ -1,19 +1,43 @@
-# MNIST Classifier with Progressive Learning
+# MNIST Classification Project
 
-A PyTorch implementation of a CNN classifier for MNIST digits using staged training and progressive learning techniques.
+A PyTorch implementation of a lightweight CNN model for MNIST digit classification with specific constraints and requirements.
+
+## Project Requirements
+
+- [x] Model Parameters: < 20,000
+- [x] Training Data Split: 50,000 train / 10,000 validation
+- [x] Training Duration: < 20 epochs
+- [x] Architecture Features: BatchNorm and Dropout
+- [x] Target Accuracy: 99.4% on validation/test set
 
 ## Model Architecture
 
-The model (`SimpleCNN`) is a convolutional neural network with:
+The model (`MNISTModel`) is a convolutional neural network with:
 
-- 3 convolutional layers with feature maps (16→8→16)
-- Batch normalization after each conv layer
-- GELU activation functions
-- Progressive dropout (2%→5%→10%)
-- Global average pooling
-- 2 fully connected layers (16→16→10)
+- **First Convolutional Block:**
+  - Conv2d: 1 input channel, 4 output channels, 3x3 kernel, stride 1, padding 1
+  - MaxPool2d: 2x2 kernel, stride 2
+  - BatchNorm2d
+  - ReLU activation
+  - Dropout2d (5%)
 
-Total parameters: ~2,962
+- **Second Convolutional Block:**
+  - Conv2d: 4 input channels, 8 output channels, 3x3 kernel, stride 1, padding 1
+  - MaxPool2d: 2x2 kernel, stride 2
+  - BatchNorm2d
+  - ReLU activation
+  - Dropout2d (10%)
+
+- **Final Convolutional Block:**
+  - Conv2d: 8 input channels, 8 output channels, 3x3 kernel, stride 2, padding 1
+
+- **Fully Connected Layers:**
+  - Flatten
+  - Linear: 128 input features, 12 output features
+  - ReLU activation
+  - Linear: 12 input features, 10 output features
+
+Total parameters: 2,710
 
 ## Training Approach
 
