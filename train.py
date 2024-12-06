@@ -154,6 +154,10 @@ def train():
         # Update epoch stats with both train and test accuracy
         logger.update_epoch_stats(epoch + 1, train_accuracy, test_accuracy, min_lr, max_lr, avg_loss)
         print(f"\nTest Accuracy: {test_accuracy:.2f}%")
+        
+        # Log test accuracy to a file
+        with open("accuracy.log", "a") as log_file:
+            log_file.write(f"Epoch {epoch + 1}: Test Accuracy: {test_accuracy:.2f}%\n")
     
     logger.print_summary_table()
 

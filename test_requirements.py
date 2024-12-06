@@ -59,6 +59,19 @@ def test_training_epochs():
         
         raise AssertionError("Could not find valid epochs value in train.py")
 
+def test_accuracy_requirement():
+    """Test if the model achieves the required accuracy"""
+    try:
+        with open("accuracy.log", "r") as log_file:
+            lines = log_file.readlines()
+            last_line = lines[-1]
+            accuracy_str = last_line.split("Test Accuracy: ")[1].strip().replace("%", "")
+            accuracy = float(accuracy_str)
+            assert accuracy >= 99.4, f"Test accuracy should be >= 99.4%, got {accuracy}%"
+            print(f"✓ Test accuracy requirement met: {accuracy}%")
+    except (FileNotFoundError, IndexError, ValueError) as e:
+        raise AssertionError("Could not verify test accuracy from logs")
+
 def main():
     print("\nTesting Project Requirements:")
     print("=============================")
@@ -68,9 +81,9 @@ def main():
         test_model_params()
         test_model_architecture()
         test_training_epochs()
+        test_accuracy_requirement()
         
         print("\nAll basic requirements met! ✓")
-        print("\nNote: 99.4% accuracy requirement needs to be verified from training logs")
         
     except AssertionError as e:
         print(f"\n❌ Test Failed: {str(e)}")
